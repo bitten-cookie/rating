@@ -7,8 +7,8 @@
 mod elo;
 mod rating;
 
+pub use crate::elo::Elo;
 pub use crate::rating::Rating;
-pub use elo::Elo;
 
 #[derive(Debug, Copy, Clone)]
 pub enum GameResult {
@@ -18,7 +18,7 @@ pub enum GameResult {
 }
 
 pub trait ScoreStrategy {
-    /// Calculates the resulting Rating of two players involved in a game
+    /// Calculates the resulting `Rating` of two players involved in a game
     ///
     /// # Arguments
     ///
@@ -30,7 +30,7 @@ pub trait ScoreStrategy {
     ///
     fn calculate(&self, player: Rating, opponent: Rating, result: GameResult) -> (Rating, Rating);
 
-    /// Calculates the final resulting Rating of two players involved in multiple games
+    /// Calculates the final resulting `Rating` of two players involved in multiple games
     ///
     /// # Return
     ///
