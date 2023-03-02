@@ -1,6 +1,5 @@
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::{Decimal, RoundingStrategy};
-use std::ops::Deref;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Rating(Decimal);
@@ -16,13 +15,13 @@ impl Rating {
     pub fn round_to_i32(&self) -> i32 {
         self.round_dp_with_strategy(0, RoundingStrategy::MidpointAwayFromZero)
             .to_i32()
-            .unwrap()
+            .unwrap_or(0)
     }
 
     pub fn rounded(&self, decimal_places: u32) -> f64 {
         self.round_dp_with_strategy(decimal_places, RoundingStrategy::MidpointAwayFromZero)
             .to_f64()
-            .unwrap()
+            .unwrap_or(0.0)
     }
 
     pub fn value(&self) -> f64 {
@@ -48,7 +47,7 @@ impl From<i64> for Rating {
     }
 }
 
-impl Deref for Rating {
+impl std::ops::Deref for Rating {
     type Target = Decimal;
 
     fn deref(&self) -> &Self::Target {
@@ -69,6 +68,12 @@ impl std::ops::Sub<Decimal> for Rating {
 
     fn sub(self, rhs: Decimal) -> Self::Output {
         Rating::new(*self - rhs)
+    }
+}
+
+impl std::fmt::Display for Rating {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 

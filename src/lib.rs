@@ -1,8 +1,14 @@
-pub use crate::rating::Rating;
-pub use elo::Elo;
+// extra lints
+#![warn(unsafe_code)]
+#![warn(clippy::all, clippy::panic, clippy::map_unwrap_or, clippy::unwrap_used)]
+// Ignore unwraps in tests
+#![cfg_attr(test, allow(clippy::unwrap_used))]
 
 mod elo;
 mod rating;
+
+pub use crate::rating::Rating;
+pub use elo::Elo;
 
 #[derive(Debug, Copy, Clone)]
 pub enum GameResult {

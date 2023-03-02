@@ -7,7 +7,6 @@ edition = "2021"
 [dependencies]
 rust_decimal = { version = "1.28", features = ["maths"] }
 rust_decimal_macros = "1.28"
-derive_more = "0.99.0"
 
 [dev-dependencies]
 test-case = "3.0.0"
