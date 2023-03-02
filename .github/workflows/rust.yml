@@ -2,6 +2,8 @@ name: Rust
 
 on:
   push:
+    branches:    
+    - master
   pull_request:
 
 env:
@@ -12,13 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
+    - name: Run clippy
       run: cargo clippy --all --all-targets --all-features
       
   test:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
     - name: Run tests
-      run: cargo test --all --verbose
+      run: cargo test --all --doc --verbose
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check format
+      run: cargo fmt --all -- --check
+      
+  outdated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/install@cargo-outdated
+      - run: cargo outdated --workspace --exit-code 1
