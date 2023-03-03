@@ -7,7 +7,7 @@
 mod elo;
 mod rating;
 
-pub use crate::elo::Elo;
+pub use crate::elo::EloStrategy;
 pub use crate::rating::Rating;
 
 #[derive(Debug, Copy, Clone)]
@@ -17,7 +17,7 @@ pub enum GameResult {
     Draw,
 }
 
-pub trait ScoreStrategy {
+pub trait CalculateRating {
     /// Calculates the resulting `Rating` of two players involved in a game
     ///
     /// # Arguments

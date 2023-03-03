@@ -1,13 +1,36 @@
-use crate::{GameResult, Rating, ScoreStrategy};
+use crate::{CalculateRating, GameResult, Rating};
 use rust_decimal::prelude::*;
 use rust_decimal_macros::dec;
 use std::ops::Sub;
 
-pub struct Elo {
-    pub k: i32,
+/// A classical Elo calculation
+///
+/// This calculation is used for head-to-head games, when two players
+/// faces each other.
+///
+/// The `k`, k-factor, determines how strongly a result affects the rating change.
+/// The higher the value, the more drastic the difference is.
+///
+/// This calculation method is used in a variety of games, with chess being
+/// the most well-known game that uses this system.
+#[derive(Clone, Debug)]
+pub struct EloStrategy {
+    k: Decimal,
 }
 
-impl ScoreStrategy for Elo {
+impl EloStrategy {
+    /// Builds an Elo calculator
+    ///
+    /// # Arguments
+    /// * `k` - the k-factor to be used for the calculation
+    pub fn new(k: u32) -> Self {
+        Self {
+            k: Decimal::from(k),
+        }
+    }
+}
+
+impl CalculateRating for EloStrategy {
     fn calculate(
         &self,
         player_one: Rating,
@@ -23,10 +46,8 @@ impl ScoreStrategy for Elo {
             GameResult::Draw => (dec!(0.5), dec!(0.5)),
         };
 
-        let k_decimal = Decimal::from(self.k);
-
-        let new_player_one_rating = player_one + k_decimal * (score_a - expected_a);
-        let new_player_two_rating = player_two + k_decimal * (score_b - expected_b);
+        let new_player_one_rating = player_one + self.k * (score_a - expected_a);
+        let new_player_two_rating = player_two + self.k * (score_b - expected_b);
 
         (new_player_one_rating, new_player_two_rating)
     }
@@ -48,14 +69,15 @@ mod tests {
     fn calculates_elo(
         player_1_rating: i32,
         player_2_rating: i32,
-        k: i32,
+        k: u32,
         game_result: GameResult,
     ) -> (Rating, Rating) {
-        let elo = Elo { k };
+        let elo = EloStrategy::new(k);
 
         elo.calculate(player_1_rating.into(), player_2_rating.into(), game_result)
     }
 
+    #[test_case(1000, 2000, 16, Win => (1015.9, 1984.1))]
     #[test_case(2600, 2300, 16, Win => (2602.4, 2297.6))]
     #[test_case(2600, 2300, 16, Loss => (2586.4, 2313.6))]
     #[test_case(2600, 2300, 16, Draw => (2594.4, 2305.6))]
@@ -65,7 +87,7 @@ mod tests {
     fn calculates_elo_correctly(
         player_1_rating: i32,
         player_2_rating: i32,
-        k: i32,
+        k: u32,
         game_result: GameResult,
     ) -> (f64, f64) {
         let (new_player_1, new_player_2) =
@@ -73,6 +95,7 @@ mod tests {
         (new_player_1.value(), new_player_2.value())
     }
 
+    #[test_case(1000, 2000, 16, Win => (1016, 1984))]
     #[test_case(2600, 2300, 16, Win => (2602, 2298))]
     #[test_case(2600, 2300, 16, Loss => (2586, 2314))]
     #[test_case(2600, 2300, 16, Draw => (2594, 2306))]
@@ -82,7 +105,7 @@ mod tests {
     fn calculates_elo_correctly_when_rounded(
         player_1_rating: i32,
         player_2_rating: i32,
-        k: i32,
+        k: u32,
         game_result: GameResult,
     ) -> (i32, i32) {
         let (new_player_1, new_player_2) =
@@ -93,13 +116,17 @@ mod tests {
     #[test_case(2600, 2300, 16, vec![Win] => (2602.4, 2297.6))]
     #[test_case(2600, 2300, 16, vec![Win, Win] => (2604.8, 2295.2))]
     #[test_case(2600, 2300, 16, vec![Win, Win, Loss] => (2591.1, 2308.9))]
+    #[test_case(2600, 2300, 16, vec![Win, Win, Loss, Loss] => (2577.7, 2322.3))]
+    #[test_case(2600, 2300, 16, vec![Win, Win, Loss, Loss, Loss] => (2564.7, 2335.3))]
+    #[test_case(2600, 2300, 16, vec![Win, Win, Loss, Loss, Loss, Loss] => (2552.1, 2347.9))]
+    #[test_case(2600, 2300, 16, vec![Win, Win, Loss, Loss, Loss, Loss, Draw] => (2547.9, 2352.1))]
     fn calculates_multiple_correctly(
         player_1_rating: i32,
         player_2_rating: i32,
-        k: i32,
+        k: u32,
         game_result: Vec<GameResult>,
     ) -> (f64, f64) {
-        let elo = Elo { k };
+        let elo = EloStrategy::new(k);
 
         let (new_player_1, new_player_2) =
             elo.calculate_multiple(player_1_rating.into(), player_2_rating.into(), game_result);

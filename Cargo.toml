@@ -1,7 +1,11 @@
 [package]
-name = "elo"
+name = "rating"
+description = "A library that implements multiple rating systems and utilities for multiplayer games"
 version = "0.1.0"
 authors = ["Bitten Cookie <hello@bittencookie.pt>"]
+keywords = ["elo", "ranking", "rating", "multiplayer"]
+license = "MIT"
+repository = "https://github.com/bitten-cookie/rating"
 edition = "2021"
 
 [dependencies]
