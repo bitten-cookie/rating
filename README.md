@@ -1,5 +1,10 @@
 # Rating
 
+
+[<img alt="Crates.io" src="https://img.shields.io/crates/v/rating?logo=rust&style=for-the-badge">](https://crates.io/crates/rating)
+[<img alt="docs.rs" src="https://img.shields.io/docsrs/rating?logo=docs.rs&style=for-the-badge">](https://docs.rs/rating)
+<img alt="License" src="https://img.shields.io/crates/l/rating?style=for-the-badge">
+
 This library provides an easy and type-safe way to maintain player's ratings.
 
 # Example
