@@ -5,6 +5,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 
 mod elo;
+mod glicko;
 mod rating;
 
 pub use crate::elo::EloStrategy;
